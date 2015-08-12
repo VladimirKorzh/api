@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import json, pika
-from api import HOST, HEARTBEAT
+from api import HOST, HEARTBEAT, X_MESSAGE_TTL
 
 
 class ApiBase():
@@ -11,7 +11,6 @@ class ApiBase():
         self.correlation_id = ''
 
     def start(self, props, pkt):
-        from api import HOST, HEARTBEAT
         self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
                                                                               heartbeat_interval=HEARTBEAT))
         self.mqConnection.add_timeout(10, self.stop)
@@ -23,7 +22,7 @@ class ApiBase():
                                                exclusive=False,
                                                passive=False,
                                                auto_delete=True,
-                                               arguments={'x-message-ttl': 60000})
+                                               arguments={'x-message-ttl': X_MESSAGE_TTL})
 
         self.map[self.server_queue] = tmp_queue.method.queue
         self.map[self.client_queue] = props.reply_to
@@ -48,9 +47,13 @@ class ApiBase():
         self.channel.basic_publish(exchange='',
                                    routing_key=queue,
                                    properties=pika.BasicProperties(correlation_id=self.correlation_id,
-                                                                   reply_to=str(self.map[self.server_queue])),
+                                                                   reply_to=str(self.map[self.server_queue]),
+                                                                    expiration=str(X_MESSAGE_TTL)),
                                    body=payload)
         print " -- msg sent: "+ queue +" "+ payload
+
+
+
 
     def on_request(self, ch, method, props, body):
         print 'got msg ' + body.pretty()

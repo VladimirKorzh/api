@@ -1,5 +1,6 @@
 __author__ = 'vladimir'
 from ApiBase import ApiBase
+from api import send_error
 
 
 class PingApi (ApiBase):
@@ -8,7 +9,7 @@ class PingApi (ApiBase):
         pass
 
     def on_request(self, ch, method, props, body):
-        #self.on_request(self, ch, method, props, body)
+        send_error(ch, method, props, body, 'error')
         self.send(str(self.map[self.server_queue]), "pong")
         self.send(str(self.map[self.client_queue]), "pong")
-
+        self.stop()

@@ -12,9 +12,7 @@ from NetworkPacket import NetworkPacket
     catalog - get catalog 
     
     sync - sync user db
-    
-    
-    
+
     reply: 
 	  {
 	    STATUS:{OK, ERROR}
@@ -25,7 +23,7 @@ from NetworkPacket import NetworkPacket
 HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
-X_MESSAGE_TTL = 60000
+X_MESSAGE_TTL = 10000
 MAIN_QUEUE_NAME = 'request'
 
 
@@ -74,13 +72,14 @@ class API_SERVICE():
 
     def on_request(self, ch, method, props, body):
         try:
-            print '-- rcvd msg: ' + body
             pkt = NetworkPacket.fromJson(body)
 
             if pkt.data['api'] in VALID_ENDPOINTS.keys():
                 thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (props, pkt))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 print '-- Starting handler for: ', pkt.data['api'], str(props.correlation_id)
+                print '-- rcvd msg: ' + body
+
             else:
                 self.send_error(ch, method, props, body, 'API call is not valid')
 
@@ -92,26 +91,26 @@ class API_SERVICE():
             print "Type error: " + e
             self.send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
-    def send_error(self, ch, method, props, body, msg):
-        # reject all the misformed packets
-        print '-- rcvd misformed packet: ' + str(body)
 
-        n = NetworkPacket()
-        n.data['status'] = 'ERROR'
-        n.data['message'] = msg
-        response = n.toJson()
+def send_error(ch, method, props, body, msg):
+    # reject all the misformed packets
+    print '-- rcvd misformed packet: ' + str(body)
 
-        ch.basic_nack(delivery_tag=method.delivery_tag,
-                      multiple=False,
-                      requeue=False)
+    n = NetworkPacket()
+    n.data['status'] = 'ERROR'
+    n.data['message'] = msg
+    response = n.toJson()
 
-        if props.reply_to != None:
-            ch.basic_publish(exchange='',
-                             routing_key=props.reply_to,
-                             properties=pika.BasicProperties(correlation_id=props.correlation_id),
-                             body=response)
+    ch.basic_nack(delivery_tag=method.delivery_tag,
+                  multiple=False,
+                  requeue=False)
 
-        return
+    if props.reply_to != None:
+        ch.basic_publish(exchange='',
+                         routing_key=props.reply_to,
+                         properties=pika.BasicProperties(correlation_id=props.correlation_id),
+                         body=response)
+
 
 
 def main():
