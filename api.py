@@ -37,9 +37,16 @@ def sync_handler(props, pkt):
     pass
 
 
-VALID_ENDPOINTS = {'auth': auth_handler,
-                   'sync': sync_handler}
+def pong_handler(props, pkt):
+    from ping import PingApi
+    a = PingApi()
+    a.start(props, pkt)
 
+
+VALID_ENDPOINTS = {}
+VALID_ENDPOINTS['auth'] = auth_handler
+VALID_ENDPOINTS['sync'] = sync_handler
+VALID_ENDPOINTS['ping'] = pong_handler
 
 class API_SERVICE():
     def __init__(self):
@@ -49,52 +56,59 @@ class API_SERVICE():
     def start_service(self):
         self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
                                                                               heartbeat_interval=HEARTBEAT))
-        channel = self.mqConnection.channel()
-        channel.basic_qos(prefetch_count=PREFETCH_COUNT)
+        self.channel = self.mqConnection.channel()
+        self.channel.basic_qos(prefetch_count=PREFETCH_COUNT)
 
-        listening_on = channel.queue_declare(queue=MAIN_QUEUE_NAME,
+        listening_on = self.channel.queue_declare(queue=MAIN_QUEUE_NAME,
                                              durable=True,
                                              exclusive=False,
                                              passive=False,
                                              auto_delete=False,
                                              arguments={'x-message-ttl': X_MESSAGE_TTL})
 
-        channel.basic_consume(self.on_request, queue=listening_on.method.queue)
+        self.channel.basic_consume(self.on_request, queue=listening_on.method.queue)
 
         print " [!] API SERVICE started"
-        channel.start_consuming()
+        self.channel.start_consuming()
 
-    @staticmethod
+
     def on_request(self, ch, method, props, body):
         try:
+            print '-- rcvd msg: ' + body
             pkt = NetworkPacket.fromJson(body)
-            print '-- rcvd msg: ' + pkt.pretty()
 
-            if pkt['api'] in VALID_ENDPOINTS.keys():
-                thread.start_new_thread(pkt['api'], (props, pkt))
+            if pkt.data['api'] in VALID_ENDPOINTS.keys():
+                thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (props, pkt))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
-                print '-- Starting handler for: ', pkt['api'], str(props.correlation_id)
-
+                print '-- Starting handler for: ', pkt.data['api'], str(props.correlation_id)
 
         except ValueError:
-            # reject all the misformed packets
-            print '-- rcvd misformed packet: ' + str(body)
+            print "ValueError"
+            self.send_error(ch, method, props, body)
+        # except TypeError:
+        #     print "TypeError"
+        #     self.send_error(ch, method, props, body)
 
-            n = NetworkPacket()
-            n.data['status'] = 'ERROR'
-            n.data['message'] = 'Packet was not recognized by API SERVICE'
-            response = n.toJson()
+    def send_error(self, ch, method, props, body):
+        # reject all the misformed packets
+        print '-- rcvd misformed packet: ' + str(body)
 
-            ch.basic_nack(delivery_tag=method.delivery_tag,
-                          multiple=False,
-                          requeue=False)
+        n = NetworkPacket()
+        n.data['status'] = 'ERROR'
+        n.data['message'] = 'Packet was not recognized by API SERVICE'
+        response = n.toJson()
 
+        ch.basic_nack(delivery_tag=method.delivery_tag,
+                      multiple=False,
+                      requeue=False)
+
+        if props.reply_to != None:
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id=props.correlation_id),
                              body=response)
 
-            return
+        return
 
 
 def main():

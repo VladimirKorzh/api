@@ -3,11 +3,13 @@ import json, pika
 from api import HOST, HEARTBEAT
 
 
-class apiBase():
+class ApiBase():
     def __init__(self):
-        pass
+        self.map = {}
+        self.client_queue = 'cli_listen_q'
+        self.server_queue = 'srv_listen_q'
 
-    def start(self, props):
+    def start(self, props, pkt):
         from api import HOST, HEARTBEAT
         self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
                                                                               heartbeat_interval=HEARTBEAT))
@@ -44,8 +46,7 @@ class apiBase():
                                    properties=pika.BasicProperties(correlation_id=self.correlation_id,
                                                                    reply_to=str(self.map[self.server_queue])),
                                    body=payload)
-        print " -- msg sent: " + p.pretty()
+        print " -- msg sent: " + payload.pretty()
 
-    @staticmethod
     def on_request(self, ch, method, props, body):
-        print 'got msg ' + str(body)
+        print 'got msg ' + body.pretty()

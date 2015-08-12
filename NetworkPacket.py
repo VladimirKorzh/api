@@ -20,6 +20,23 @@ class NetworkPacket():
     def toJson(self):
         return json.dumps(self.data)
 
-    def fromJson(self, obj):
-        self.data = json.loads(obj)
-        return self
+    @staticmethod
+    def fromJson(obj):
+        data = json.loads(obj)
+        np = NetworkPacket()
+        np.data = data
+        return np
+
+
+
+def main():
+  a = NetworkPacket()
+  a.data['api'] = 'ping'
+  b = a.toJson()
+  print a.toJson()
+  c = NetworkPacket.fromJson(b)
+  print c.toJson(), c.data
+
+
+if __name__ == '__main__':
+    main()
