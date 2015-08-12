@@ -8,7 +8,7 @@ class PingApi (ApiBase):
         pass
 
     def on_request(self, ch, method, props, body):
-        ApiBase.on_request(ch, method, props, body)
-        self.send("pong")
-        self.stop()
+        #self.on_request(self, ch, method, props, body)
+        self.send(str(self.map[self.server_queue]), "pong")
+        self.send(str(self.map[self.client_queue]), "pong")
 

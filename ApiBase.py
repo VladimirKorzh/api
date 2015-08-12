@@ -8,6 +8,7 @@ class ApiBase():
         self.map = {}
         self.client_queue = 'cli_listen_q'
         self.server_queue = 'srv_listen_q'
+        self.correlation_id = ''
 
     def start(self, props, pkt):
         from api import HOST, HEARTBEAT
@@ -32,6 +33,9 @@ class ApiBase():
 
         self.consumer_tag = self.channel.basic_consume(self.on_request, queue=str(self.map[self.server_queue]))
 
+        self.send(str(self.map[self.server_queue]), pkt.toJson())
+        self.correlation_id = props.correlation_id
+
         print " [x] Personal Api worker starts listening"
         self.channel.start_consuming()
 
@@ -40,13 +44,13 @@ class ApiBase():
         self.mqConnection.close()
         print " [x] Api worker has stopped listening for: ", self.consumer_tag
 
-    def send(self, payload):
+    def send(self, queue, payload):
         self.channel.basic_publish(exchange='',
-                                   routing_key=str(self.map[self.client_queue]),
+                                   routing_key=queue,
                                    properties=pika.BasicProperties(correlation_id=self.correlation_id,
                                                                    reply_to=str(self.map[self.server_queue])),
                                    body=payload)
-        print " -- msg sent: " + payload.pretty()
+        print " -- msg sent: "+ queue +" "+ payload
 
     def on_request(self, ch, method, props, body):
         print 'got msg ' + body.pretty()
