@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import pika
+import thread
+from NetworkPacket import NetworkPacket
 
 """
     AUTH:
@@ -88,12 +90,13 @@ class api():
     
     
 def auth_handler(props,pkt):
+    pass
 
 def sync_handler(props,pkt)
-  print '-- Starting sync handler for: ' + str(props.correlation_id)
+    pass
   
 def main():
-  api = ApiEncryptionHandshake()
+  api = api()
   api.start_service()
   
 if __name__ == '__main__':

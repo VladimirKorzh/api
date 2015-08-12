@@ -36,3 +36,15 @@ class apiBase():
     self.channel.basic_cancel(consumer_tag=self.consumer_tag)
     self.mqConnection.close()
     print " [x] Api worker has stopped listening for: ", self.consumer_tag
+    
+  def 
+    self.channel.basic_publish(exchange='',
+			      routing_key=str(self.map[self.client_queue]),
+			      properties=pika.BasicProperties(correlation_id = self.correlation_id,
+							      reply_to = str(self.map[self.server_queue])),
+			      body=response)    
+    print " -- sent: " + p.pretty()    
+    
+    
+  def on_request(self, ch, method, props, body):
+      print 'got msg ' + str(body)    
