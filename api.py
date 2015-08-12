@@ -81,21 +81,24 @@ class API_SERVICE():
                 thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (props, pkt))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 print '-- Starting handler for: ', pkt.data['api'], str(props.correlation_id)
+            else:
+                self.send_error(ch, method, props, body, 'API call is not valid')
 
-        except ValueError:
-            print "ValueError"
-            self.send_error(ch, method, props, body)
-        # except TypeError:
-        #     print "TypeError"
-        #     self.send_error(ch, method, props, body)
+        except ValueError as e:
+            print "Value error: " + e
+            self.send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
-    def send_error(self, ch, method, props, body):
+        except TypeError as e:
+            print "Type error: " + e
+            self.send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
+
+    def send_error(self, ch, method, props, body, msg):
         # reject all the misformed packets
         print '-- rcvd misformed packet: ' + str(body)
 
         n = NetworkPacket()
         n.data['status'] = 'ERROR'
-        n.data['message'] = 'Packet was not recognized by API SERVICE'
+        n.data['message'] = msg
         response = n.toJson()
 
         ch.basic_nack(delivery_tag=method.delivery_tag,
