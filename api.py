@@ -23,17 +23,20 @@ from NetworkPacket import NetworkPacket
 HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
-X_MESSAGE_TTL = 10000
+X_MESSAGE_TTL = 60000
 MAIN_QUEUE_NAME = 'request'
 
 
 def auth_handler(props, pkt):
     pass
 
-
 def sync_handler(props, pkt):
     pass
 
+def catalog_handler(props, pkt):
+    from api_catalog import CatalogApi
+    a = CatalogApi()
+    a.start(props, pkt)
 
 def pong_handler(props, pkt):
     from ping import PingApi
@@ -45,6 +48,7 @@ VALID_ENDPOINTS = {}
 VALID_ENDPOINTS['auth'] = auth_handler
 VALID_ENDPOINTS['sync'] = sync_handler
 VALID_ENDPOINTS['ping'] = pong_handler
+VALID_ENDPOINTS['catalog'] = catalog_handler
 
 class API_SERVICE():
     def __init__(self):
@@ -81,15 +85,15 @@ class API_SERVICE():
                 print '-- rcvd msg: ' + body
 
             else:
-                self.send_error(ch, method, props, body, 'API call is not valid')
+                send_error(ch, method, props, body, 'API call is not valid')
 
         except ValueError as e:
-            print "Value error: " + e
-            self.send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
+            print "Value error: "
+            send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
         except TypeError as e:
-            print "Type error: " + e
-            self.send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
+            print "Type error: "
+            send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
 
 def send_error(ch, method, props, body, msg):
