@@ -3,38 +3,10 @@ from peewee import *
 from ApiBase import ApiBase
 from api import send_error
 from NetworkPacket import NetworkPacket
-from playhouse.shortcuts import model_to_dict
-
-"""
-    "API": "auth"
-    "msg": {
-                "type": "login", "add_account"
-            }
-"""
-db = SqliteDatabase('auth.db')
+from DatabaseModels import *
 
 VALID_REQUEST_TYPES = ['login', 'add_account']
 VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone']
-
-class BaseModel(Model):
-    class Meta:
-        database = db
-
-class User(BaseModel):
-    uuid = CharField(unique=True)
-    db = TextField(null=True)
-
-class Device(BaseModel):
-    user = ForeignKeyField(User, related_name='devices', null=True)
-    device_id = CharField(index=True)
-    device_name = TextField()
-
-
-class SocialData(BaseModel):
-    user = ForeignKeyField(User, related_name='accounts', null=True)
-    medium = CharField(null=True)
-    value = CharField(null=True)
-    data = TextField(null=True)
 
 
 class ApiAuth(ApiBase):
@@ -62,8 +34,8 @@ class ApiAuth(ApiBase):
             else:
                 send_error(ch, method, props, body, 'Invalid request field type')
         except Exception, e:
-            print "ERROR", str(e)
-        db.close()
+            print "ERROR", str(e), e.message, e.__class__
+        self.db.close()
 
     def handle_login(self, pkt):
         # lets check his account information first
@@ -81,8 +53,6 @@ class ApiAuth(ApiBase):
             n.data['message'] = ''
 
             self.send(str(self.map[self.client_queue]), n.toJson())
-
-
 
         if medium in VALID_MEDIUM_TYPES:
 
@@ -137,6 +107,7 @@ class ApiAuth(ApiBase):
             uuid = pkt.data['uuid']
             medium = pkt.data['message']['medium_type']
             value = pkt.data['message']['medium_data']
+
 
             # find user
             user = User.get(User.uuid == uuid)
@@ -205,6 +176,7 @@ def main():
     pp.pprint(n.data)
 
     print "\n", n.toJson(),"\n"
+
 # {   'accounts': [{   'data': u'korshakv', 'id': 1, 'medium': u'vk'}],
 #     'db': None,
 #     'devices': [   {   'device_id': u'test_id',
@@ -217,11 +189,16 @@ def main():
 #     'uuid': '13ab9ad4-4904-5fa7-91d6-b5808245b46b',
 #     'vk': u'korshakv'}
 
+
+
+
+
+    # {"message": {"medium_type": "fb", "device_data": {"timestamp": 1439448064478, "device_name": "LGE Nexus 4", "device_id": "9a9622ef5c84229"}, "medium_data": {"name": "Alex Yermolenko", "DOB": "", "gender": "male", "url": "https://www.facebook.com/app_scoped_user_id/10202972046261630/", "email": "alexvw@ukr.net", "fotourl": "https://graph.facebook.com/10202972046261630/picture?type=large"}}, "api": "auth", "func": "login"}
+
+
     n.data['api'] = 'auth'
     n.data['func'] = 'add_account'
     n.data['uuid'] = '488416f4-fcaf-5027-8c63-0105cfa213ea'
-
-
 
     n.data['message'] = {}
     n.data['message']['medium_type'] = 'fb'
