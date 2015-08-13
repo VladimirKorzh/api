@@ -24,27 +24,27 @@ HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
 X_MESSAGE_TTL = 60000
-MAIN_QUEUE_NAME = 'auth'
+MAIN_QUEUE_NAME = 'request-vk'
 
 
-def auth_handler(props, pkt):
+def auth_handler(conn, props, pkt):
     from api_auth import ApiAuth
     a = ApiAuth()
-    a.start(props,pkt)
+    a.start(conn, props,pkt)
 
 
-def sync_handler(props, pkt):
+def sync_handler(conn, props, pkt):
     pass
 
-def catalog_handler(props, pkt):
+def catalog_handler(conn, props, pkt):
     from api_catalog import CatalogApi
     a = CatalogApi()
-    a.start(props, pkt)
+    a.start(conn, props, pkt)
 
-def pong_handler(props, pkt):
+def pong_handler(conn, props, pkt):
     from api_ping import PingApi
     a = PingApi()
-    a.start(props, pkt)
+    a.start(conn, props, pkt)
 
 
 VALID_ENDPOINTS = {}
@@ -65,11 +65,11 @@ class API_SERVICE():
         self.channel.basic_qos(prefetch_count=PREFETCH_COUNT)
 
         listening_on = self.channel.queue_declare(queue=MAIN_QUEUE_NAME,
-                                             durable=True,
-                                             exclusive=False,
-                                             passive=False,
-                                             auto_delete=False,
-                                             arguments={'x-message-ttl': X_MESSAGE_TTL})
+                                                 durable=True,
+                                                 exclusive=False,
+                                                 passive=False,
+                                                 auto_delete=False,
+                                                 arguments={'x-message-ttl': X_MESSAGE_TTL})
 
         self.channel.basic_consume(self.on_request, queue=listening_on.method.queue)
 
@@ -81,7 +81,7 @@ class API_SERVICE():
             pkt = NetworkPacket.fromJson(body)
 
             if pkt.data['api'] in VALID_ENDPOINTS.keys():
-                thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (props, pkt))
+                thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (self.mqConnection, props, pkt))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 print '-- Starting handler for: ', pkt.data['api'], str(props.correlation_id)
                 print '-- rcvd msg: ' + body

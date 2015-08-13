@@ -5,6 +5,7 @@ from api import send_error
 import json
 import geopy
 import gzip
+import zlib
 from NetworkPacket import NetworkPacket
 
 from playhouse.csv_loader import load_csv, dump_csv
@@ -33,7 +34,7 @@ class CatalogApi(ApiBase):
             n = NetworkPacket()
             n.data['status'] = 'OK'
             n.data['msg'] = toJson(CATALOGS[type])
-            response = gzip.compress(n.toJson())
+            response = zlib.compress(n.toJson())
         else:
             send_error(ch, method, props, body, 'Invalid request field type')
 
