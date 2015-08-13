@@ -76,7 +76,6 @@ class API_SERVICE():
         print " [!] API SERVICE started"
         self.channel.start_consuming()
 
-
     def on_request(self, ch, method, props, body):
         try:
             pkt = NetworkPacket.fromJson(body)

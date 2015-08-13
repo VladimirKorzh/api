@@ -5,14 +5,13 @@ from api import send_error
 from NetworkPacket import NetworkPacket
 from playhouse.shortcuts import model_to_dict
 
-
 """
     "API": "auth"
     "msg": {
                 "type": "login", "add_account"
             }
 """
-db = SqliteDatabase('temp.db')
+db = SqliteDatabase('auth.db')
 
 VALID_REQUEST_TYPES = ['login', 'add_account']
 VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone']
@@ -20,7 +19,6 @@ VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone']
 class BaseModel(Model):
     class Meta:
         database = db
-
 
 class User(BaseModel):
     uuid = CharField(unique=True)
@@ -140,7 +138,6 @@ class ApiAuth(ApiBase):
             medium = pkt.data['message']['medium_type']
             value = pkt.data['message']['medium_data']
 
-
             # find user
             user = User.get(User.uuid == uuid)
 
@@ -208,7 +205,6 @@ def main():
     pp.pprint(n.data)
 
     print "\n", n.toJson(),"\n"
-
 # {   'accounts': [{   'data': u'korshakv', 'id': 1, 'medium': u'vk'}],
 #     'db': None,
 #     'devices': [   {   'device_id': u'test_id',
