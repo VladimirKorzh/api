@@ -34,6 +34,12 @@ class CatalogApi(ApiBase):
             n = NetworkPacket()
             n.data['status'] = 'OK'
             n.data['msg'] = toJson(CATALOGS[type])
+
+            a = zlib.compress(n.toJson())
+            b = zlib.decompress(a)
+            print b
+
+
             response = zlib.compress(n.toJson())
         else:
             send_error(ch, method, props, body, 'Invalid request field type')
