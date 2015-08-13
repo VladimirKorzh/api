@@ -50,7 +50,7 @@ class ApiBase():
                                                                    reply_to=str(self.map[self.server_queue]),
                                                                     expiration=str(X_MESSAGE_TTL)),
                                    body=payload)
-        print " -- msg sent: "+ queue +" "+ payload
+        print " -- msg sent into q: "+ queue +": "+ payload
 
 
 

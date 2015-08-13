@@ -24,11 +24,14 @@ HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
 X_MESSAGE_TTL = 60000
-MAIN_QUEUE_NAME = 'request'
+MAIN_QUEUE_NAME = 'request-vk'
 
 
 def auth_handler(props, pkt):
-    pass
+    from api_auth import ApiAuth
+    a = ApiAuth()
+    a.start(props,pkt)
+
 
 def sync_handler(props, pkt):
     pass
@@ -39,7 +42,7 @@ def catalog_handler(props, pkt):
     a.start(props, pkt)
 
 def pong_handler(props, pkt):
-    from ping import PingApi
+    from api_ping import PingApi
     a = PingApi()
     a.start(props, pkt)
 
@@ -87,12 +90,16 @@ class API_SERVICE():
             else:
                 send_error(ch, method, props, body, 'API call is not valid')
 
+        except KeyError as e:
+            print "Key error: ",
+            send_error(ch, method, props, body, 'Have you forgot to state whice API endpoint you are calling?')
+
         except ValueError as e:
-            print "Value error: "
+            print "Value error: ",
             send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
         except TypeError as e:
-            print "Type error: "
+            print "Type error: ",
             send_error(ch, method, props, body, 'Packet was not recognized by API SERVICE')
 
 
