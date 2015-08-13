@@ -11,8 +11,9 @@ class ApiBase():
         self.correlation_id = ''
         self.consumer_tag = ''
 
-    def start(self, conn, props, pkt):
-        self.mqConnection = conn
+    def start(self, props, pkt):
+        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
+                                                                              heartbeat_interval=HEARTBEAT))
         self.mqConnection.add_timeout(10, self.stop)
 
         self.channel = self.mqConnection.channel()
@@ -40,7 +41,8 @@ class ApiBase():
 
     def stop(self):
         self.channel.basic_cancel(consumer_tag=self.consumer_tag)
-
+        self.channel.close()
+        self.mqConnection.close()
         print " [x] Api worker has stopped listening for: ", self.consumer_tag
 
     def send(self, queue, payload):

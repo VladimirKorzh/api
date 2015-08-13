@@ -27,24 +27,24 @@ X_MESSAGE_TTL = 60000
 MAIN_QUEUE_NAME = 'request-vk'
 
 
-def auth_handler(conn, props, pkt):
+def auth_handler(props, pkt):
     from api_auth import ApiAuth
     a = ApiAuth()
-    a.start(conn, props,pkt)
+    a.start(props, pkt)
 
 
-def sync_handler(conn, props, pkt):
+def sync_handler(props, pkt):
     pass
 
-def catalog_handler(conn, props, pkt):
+def catalog_handler(props, pkt):
     from api_catalog import CatalogApi
     a = CatalogApi()
-    a.start(conn, props, pkt)
+    a.start(props, pkt)
 
-def pong_handler(conn, props, pkt):
+def pong_handler(props, pkt):
     from api_ping import PingApi
     a = PingApi()
-    a.start(conn, props, pkt)
+    a.start(props, pkt)
 
 
 VALID_ENDPOINTS = {}
@@ -59,8 +59,7 @@ class API_SERVICE():
         pass
 
     def start_service(self):
-        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
-                                                                              heartbeat_interval=HEARTBEAT))
+        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
         self.channel = self.mqConnection.channel()
         self.channel.basic_qos(prefetch_count=PREFETCH_COUNT)
 
@@ -81,7 +80,7 @@ class API_SERVICE():
             pkt = NetworkPacket.fromJson(body)
 
             if pkt.data['api'] in VALID_ENDPOINTS.keys():
-                thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (self.mqConnection, props, pkt))
+                thread.start_new_thread(VALID_ENDPOINTS[pkt.data['api']], (props, pkt))
                 ch.basic_ack(delivery_tag=method.delivery_tag)
                 print '-- Starting handler for: ', pkt.data['api'], str(props.correlation_id)
                 print '-- rcvd msg: ' + body
