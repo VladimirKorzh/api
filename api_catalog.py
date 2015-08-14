@@ -4,7 +4,8 @@ from ApiBase import ApiBase
 from api import send_error
 import json
 import geopy
-import gzip
+import time
+import zlib
 from NetworkPacket import NetworkPacket
 
 from playhouse.csv_loader import load_csv, dump_csv
@@ -15,7 +16,7 @@ from geopy.geocoders import Yandex
 db = SqliteDatabase('catalog.db')
 Pharmacy = load_csv(db, 'catalog_pharmacy.csv')
 Clinics = load_csv(db, 'catalog_clinics.csv')
-Drugs = load_csv(db, 'catalog_clinics.csv')
+Drugs = load_csv(db, 'catalog_drugs.csv')
 Diseases = load_csv(db, 'catalog_disease.csv')
 
 CATALOGS = {'clinics': Clinics, 'pharmacy': Pharmacy, 'diseases': Diseases, 'drugs': Drugs}
@@ -32,8 +33,8 @@ class CatalogApi(ApiBase):
         if type in CATALOGS.keys():
             n = NetworkPacket()
             n.data['status'] = 'OK'
-            n.data['msg'] = toJson(CATALOGS[type])
-            response = gzip.compress(n.toJson())
+            n.data['message'] = toJson(CATALOGS[type])
+            response = n.toJson()
         else:
             send_error(ch, method, props, body, 'Invalid request field type')
 
@@ -46,13 +47,24 @@ def toJson(object):
         r.append(model_to_dict(subObject))
     return json.dumps(r)
 
-# def main():
-#     geolocator = Yandex()
-#     for subObject in Pharmacy:
-#
-#     print (subObject.lat, subObject.lon)
-#
-#
-#
-# if __name__ == '__main__':
-#     main()
+def main():
+    print(toJson(Pharmacy))
+    # parseAndSaveAdresses(Pharmacy)
+    # printAdresses(Pharmacy)
+
+def parseAndSaveAdresses(object):
+    geolocator = Yandex()
+    for subObject in object:
+         location = geolocator.geocode(subObject.addr)
+         subObject.lat = location.latitude
+         subObject.lon = location.longitude
+         subObject.save()
+         print(subObject.lat, subObject.lon)
+         time.sleep(3)
+
+def printAdresses(object):
+    for subObject in object:
+         print(subObject.lat, subObject.lon)
+
+if __name__ == '__main__':
+ main()
