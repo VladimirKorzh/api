@@ -13,7 +13,7 @@ class ApiBase():
 
     def start(self, props, pkt):
         self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
-        self.mqConnection.add_timeout(10, self.stop)
+        self.mqConnection.add_timeout(30, self.stop)
 
         self.channel = self.mqConnection.channel()
         self.channel.basic_qos(prefetch_count=1)
