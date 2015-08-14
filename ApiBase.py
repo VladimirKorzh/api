@@ -9,11 +9,11 @@ class ApiBase():
         self.client_queue = 'cli_listen_q'
         self.server_queue = 'srv_listen_q'
         self.correlation_id = ''
+        self.consumer_tag = ''
 
     def start(self, props, pkt):
-        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
-                                                                              heartbeat_interval=HEARTBEAT))
-        self.mqConnection.add_timeout(10, self.stop)
+        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
+        self.mqConnection.add_timeout(30, self.stop)
 
         self.channel = self.mqConnection.channel()
         self.channel.basic_qos(prefetch_count=1)
@@ -40,6 +40,7 @@ class ApiBase():
 
     def stop(self):
         self.channel.basic_cancel(consumer_tag=self.consumer_tag)
+        self.channel.close()
         self.mqConnection.close()
         print " [x] Api worker has stopped listening for: ", self.consumer_tag
 
@@ -48,9 +49,9 @@ class ApiBase():
                                    routing_key=queue,
                                    properties=pika.BasicProperties(correlation_id=self.correlation_id,
                                                                    reply_to=str(self.map[self.server_queue]),
-                                                                    expiration=str(X_MESSAGE_TTL)),
+                                                                   expiration=str(X_MESSAGE_TTL)),
                                    body=payload)
-        print " -- msg sent into q: "+ queue +": "+ payload
+        print " -- msg sent into q: " + queue +": " + payload
 
 
 

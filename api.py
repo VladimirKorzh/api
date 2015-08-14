@@ -3,38 +3,23 @@ import pika
 import thread
 from NetworkPacket import NetworkPacket
 
-"""
-    AUTH:
-      sign_up - register new user in system
-      login - check user authenticity
-      connect - join account info    
-      
-    catalog - get catalog 
-    
-    sync - sync user db
-
-    reply: 
-	  {
-	    STATUS:{OK, ERROR}
-	    MSG: {}
-	  }
-"""
-
 HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
 X_MESSAGE_TTL = 60000
-MAIN_QUEUE_NAME = 'auth'
+MAIN_QUEUE_NAME = 'request-vk'
 
 
 def auth_handler(props, pkt):
     from api_auth import ApiAuth
     a = ApiAuth()
-    a.start(props,pkt)
+    a.start(props, pkt)
 
 
 def sync_handler(props, pkt):
-    pass
+    from api_sync import SyncApi
+    a = SyncApi()
+    a.start(props, pkt)
 
 def catalog_handler(props, pkt):
     from api_catalog import CatalogApi
@@ -59,17 +44,16 @@ class API_SERVICE():
         pass
 
     def start_service(self):
-        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
-                                                                              heartbeat_interval=HEARTBEAT))
+        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
         self.channel = self.mqConnection.channel()
         self.channel.basic_qos(prefetch_count=PREFETCH_COUNT)
 
         listening_on = self.channel.queue_declare(queue=MAIN_QUEUE_NAME,
-                                             durable=True,
-                                             exclusive=False,
-                                             passive=False,
-                                             auto_delete=False,
-                                             arguments={'x-message-ttl': X_MESSAGE_TTL})
+                                                 durable=True,
+                                                 exclusive=False,
+                                                 passive=False,
+                                                 auto_delete=False,
+                                                 arguments={'x-message-ttl': X_MESSAGE_TTL})
 
         self.channel.basic_consume(self.on_request, queue=listening_on.method.queue)
 
