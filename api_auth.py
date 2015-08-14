@@ -4,9 +4,10 @@ from ApiBase import ApiBase
 from api import send_error
 from NetworkPacket import NetworkPacket
 from DatabaseModels import *
+import json
 
 VALID_REQUEST_TYPES = ['login', 'add_account']
-VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone']
+VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone', 'email']
 
 
 class ApiAuth(ApiBase):
@@ -63,11 +64,51 @@ class ApiAuth(ApiBase):
             if medium in ['phone']:
                 userSocialData, createdSocial = SocialData.get_or_create(medium=medium, value=value)
                 uuid = self.generate_uuid(value)
+            if medium in ['email']:
+                try:
+                    if value['action'] == 'register':
+                        userSocialData = SocialData(medium=medium,
+                                                      data=str(value),
+                                                      value=value['login'])
+                        uuid = self.generate_uuid(value['login'])
+                        userSocialData.save()
+                        createdSocial = True
+
+                    if value['action'] == 'login':
+                        userSocialData = SocialData.select().where(SocialData.value == value['login']).get()
+                        d = json.loads(userSocialData.data.replace("'","\"").replace("u\"", "\""))
+
+                        if d['password'] == value['password']:
+                            uuid = self.generate_uuid(value['login'])
+                            createdSocial = False
+                        else:
+                            print 'user with such login/pass not found '
+                            n = NetworkPacket()
+                            n.data['status'] = "ERROR"
+                            n.data['message'] = "Password is correct"
+                            self.send(str(self.map[self.client_queue]), n.toJson())
+                            return
+
+                except Exception as e:
+                    print 'user with such login/pass not found ' + str(e)
+                    n = NetworkPacket()
+                    n.data['status'] = "ERROR"
+                    n.data['message'] = str(e)
+                    self.send(str(self.map[self.client_queue]), n.toJson())
+                    return
+
 
             if createdSocial == False:
                 # user exists
                 user = userSocialData.user
                 print "-- returning user"
+
+                # if pkt.data['message']['hash'] == userSocialData.data:
+                #   # sha1 passwd hash
+                #     print 'valid password'
+                # else:
+                #     print 'invalid password'
+
             else:
                 # new user
                 user = User(db=None, uuid=uuid)
@@ -167,8 +208,11 @@ def main():
     n.data['func'] = 'login'
 
     n.data['message'] = {}
-    n.data['message']['medium_type'] = 'phone'
-    n.data['message']['medium_data'] = '2334124312'
+    n.data['message']['medium_type'] = 'email'
+    n.data['message']['medium_data'] = {}
+    n.data['message']['medium_data']['login'] = 'vladimirkorshak@gmail.com'
+    n.data['message']['medium_data']['password'] = '228121389'
+    n.data['message']['medium_data']['action'] = 'register'
 
     n.data['message']['device_data'] = {}
     n.data['message']['device_data']['device_id'] = 'test_id'
@@ -191,6 +235,7 @@ def main():
 
 
 
+ # {"message": {"medium_type": "email", "device_data": {"device_name": "test_name", "device_id": "test_id"}, "medium_data": "vladimirkorshak@gmail.com"}, "api": "auth", "func": "login"}
 
 
     # {"message": {"medium_type": "fb", "device_data": {"timestamp": 1439448064478, "device_name": "LGE Nexus 4", "device_id": "9a9622ef5c84229"}, "medium_data": {"name": "Alex Yermolenko", "DOB": "", "gender": "male", "url": "https://www.facebook.com/app_scoped_user_id/10202972046261630/", "email": "alexvw@ukr.net", "fotourl": "https://graph.facebook.com/10202972046261630/picture?type=large"}}, "api": "auth", "func": "login"}
