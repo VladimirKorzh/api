@@ -32,10 +32,13 @@ class NetworkPacket():
 def main():
   a = NetworkPacket()
   a.data['api'] = 'ping'
+  a.data['list'] = {}
+  a.data['list']['test'] = 'test'
   b = a.toJson()
   print a.toJson()
   c = NetworkPacket.fromJson(b)
-  print c.toJson(), c.data
+  print c.toJson()
+  print c.data
 
 
 if __name__ == '__main__':

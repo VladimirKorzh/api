@@ -4,7 +4,7 @@ from api import send_error
 from NetworkPacket import NetworkPacket
 from DatabaseModels import *
 import json
-
+from api import send_error, byteify
 """
     ['api'] = 'auth'
     ['func'] = 'login'
@@ -61,7 +61,7 @@ class ApiAuth(ApiBase):
         # lets check his account information first
         # medium: phone, vk, fb, gp, loginpass
         medium = pkt.data['message']['medium_type']
-        value = pkt.data['message']['medium_data']
+
 
         if medium == 'guest':
             userDevice, createdDevice = Device.get_or_create( device_id=pkt.data['message']['device_data']['device_id'],
@@ -70,9 +70,11 @@ class ApiAuth(ApiBase):
 
             n = NetworkPacket()
             n.data['status'] = "OK"
-            n.data['message'] = ''
+            n.data['message'] = None
             self.send(str(self.map[self.client_queue]), n.toJson())
             return
+
+        value = pkt.data['message']['medium_data']
 
         if medium not in VALID_MEDIUM_TYPES:
             n = NetworkPacket()
@@ -99,7 +101,7 @@ class ApiAuth(ApiBase):
                 if createdSocial == False:
                     # user exists if have not created a social account for him
                     user = userSocialData.user
-                    print " -- user account exists ", user
+                    print " -- user account exists "
                 else:
                     print " -- new account is going to be created"
                     # we have a new incoming user trying to login
@@ -110,9 +112,10 @@ class ApiAuth(ApiBase):
                 n = NetworkPacket()
                 n.data['status'] = "OK"
                 n.data['message'] = {}
-                print json.dumps(user.db)
-
-                n.data['message']['db'] = json.dumps(user.db)
+                if user.db is not None:
+                    n.data['message']['db'] = byteify(json.loads(user.db))
+                else:
+                    n.data['message']['db'] = None
                 n.data['message']['uuid'] = user.uuid
                 self.send(str(self.map[self.client_queue]), n.toJson())
                 return
@@ -138,7 +141,7 @@ class ApiAuth(ApiBase):
                     uuid = self.generate_uuid(value)
 
                 if createdSocial == True:
-                    userSocialData = user
+                    userSocialData.user = user
                     userSocialData.data = pkt.data['message']['medium_data']
                     userSocialData.save()
                     user.save()

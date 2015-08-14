@@ -1,6 +1,6 @@
 __author__ = 'vladimir'
 from ApiBase import ApiBase
-from api import send_error
+from api import send_error, byteify
 from DatabaseModels import *
 from NetworkPacket import NetworkPacket
 import json
@@ -73,19 +73,11 @@ class SyncApi (ApiBase):
 
             n = NetworkPacket()
             n.data['status'] = "UPDATE"
-            n.data['message'] = json.loads(user.db)
+            n.data['message'] = byteify(json.loads(user.db))
             print n.data['message']
             self.send(str(self.map[self.client_queue]), n.toJson())
 
-def byteify(input):
-    if isinstance(input, dict):
-        return {byteify(key): byteify(value) for key, value in input.iteritems()}
-    elif isinstance(input, list):
-        return [byteify(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
-    else:
-        return input
+
 
 
 def main():
