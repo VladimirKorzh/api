@@ -197,7 +197,8 @@ class ApiAuth(ApiBase):
                 return None, None
             else:
                 # create new social data object
-                userSocialData = SocialData(medium=medium, data=str(value), value=value['login'])
+                print value
+                userSocialData = SocialData(medium=medium, data=value, value=value['login'])
 
                 # try to save object
                 userSocialData.save()
@@ -213,8 +214,8 @@ class ApiAuth(ApiBase):
                 self.send(str(self.map[self.client_queue]), n.toJson())
                 return None, None
             else:
-
-                d = json.dumps(userSocialData.data)
+                print userSocialData.data
+                d = json.loads(userSocialData.data)
 
                 if d['password'] == value['password']:
                     uuid = self.generate_uuid(value['login'])
@@ -247,7 +248,7 @@ class ApiAuth(ApiBase):
         userDevice.save()
 
         userSocialData.user = user
-        userSocialData.data = pkt.data['message']['medium_data']
+        userSocialData.data = byteify(json.dumps(pkt.data['message']['medium_data']))
         userSocialData.save()
 
         user.save()
