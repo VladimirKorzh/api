@@ -3,43 +3,53 @@ __author__ = 'Alex'
 from ApiBase import ApiBase
 from api import send_error
 import json
-import geopy
 import time
-import zlib
 from NetworkPacket import NetworkPacket
 
-from playhouse.csv_loader import load_csv, dump_csv
+from playhouse.csv_loader import load_csv
 from playhouse.shortcuts import *
 
 from geopy.geocoders import Yandex
 
-db = SqliteDatabase('catalog.db')
-Pharmacy = load_csv(db, 'catalog_pharmacy.csv')
-Clinics = load_csv(db, 'catalog_clinics.csv')
-Drugs = load_csv(db, 'catalog_drugs.csv')
-Diseases = load_csv(db, 'catalog_disease.csv')
-
-CATALOGS = {'clinics': Clinics, 'pharmacy': Pharmacy, 'diseases': Diseases, 'drugs': Drugs}
 
 class CatalogApi(ApiBase):
     def __init__(self):
         ApiBase.__init__(self)
-        pass
+        self.db = SqliteDatabase(':memory:')
+
+        self.Pharmacy = load_csv(self.db, 'catalog_pharmacy.csv')
+        self.Clinics = load_csv(self.db,  'catalog_clinics.csv')
+        self.Drugs = load_csv(self.db,    'catalog_clinics.csv')
+        self.Disease = load_csv(self.db,  'catalog_disease.csv')
+
+        self.CATALOGS = {'pharmacy': self.Pharmacy,
+                        'clinics':   self.Clinics,
+                        'drugs':     self.Drugs,
+                        'diseases':  self.Disease}
+
 
     def on_request(self, ch, method, props, body):
         pkt = NetworkPacket.fromJson(body)
         type = pkt.data['func']
 
-        if type in CATALOGS.keys():
+        if type in self.CATALOGS.keys():
             n = NetworkPacket()
             n.data['status'] = 'OK'
-            n.data['message'] = toJson(CATALOGS[type])
+            n.data['message'] = toJson(self.CATALOGS[type])
             response = n.toJson()
         else:
             send_error(ch, method, props, body, 'Invalid request field type')
+            self.db.close()
+            return
 
-        self.send(str(self.map[self.server_queue]), "pong")
         self.send(str(self.map[self.client_queue]), response)
+        self.send(str(self.map[self.server_queue]), "pong")
+
+        self.db.close()
+
+
+
+
 
 def toJson(object):
     r = []
