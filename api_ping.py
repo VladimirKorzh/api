@@ -2,6 +2,12 @@ __author__ = 'vladimir'
 from ApiBase import ApiBase
 from api import send_error
 
+"""
+    request: ping
+
+    reply: "pong"
+"""
+
 
 class PingApi (ApiBase):
     def __init__(self):

@@ -12,8 +12,7 @@ class ApiBase():
         self.consumer_tag = ''
 
     def start(self, props, pkt):
-        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST,
-                                                                              heartbeat_interval=HEARTBEAT))
+        self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
         self.mqConnection.add_timeout(10, self.stop)
 
         self.channel = self.mqConnection.channel()
@@ -50,9 +49,9 @@ class ApiBase():
                                    routing_key=queue,
                                    properties=pika.BasicProperties(correlation_id=self.correlation_id,
                                                                    reply_to=str(self.map[self.server_queue]),
-                                                                    expiration=str(X_MESSAGE_TTL)),
+                                                                   expiration=str(X_MESSAGE_TTL)),
                                    body=payload)
-        print " -- msg sent into q: "+ queue +": "+ payload
+        print " -- msg sent into q: " + queue +": " + payload
 
 
 

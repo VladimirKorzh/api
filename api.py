@@ -3,23 +3,6 @@ import pika
 import thread
 from NetworkPacket import NetworkPacket
 
-"""
-    AUTH:
-      sign_up - register new user in system
-      login - check user authenticity
-      connect - join account info    
-      
-    catalog - get catalog 
-    
-    sync - sync user db
-
-    reply: 
-	  {
-	    STATUS:{OK, ERROR}
-	    MSG: {}
-	  }
-"""
-
 HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
@@ -34,7 +17,9 @@ def auth_handler(props, pkt):
 
 
 def sync_handler(props, pkt):
-    pass
+    from api_sync import SyncApi
+    a = SyncApi()
+    a.start(props, pkt)
 
 def catalog_handler(props, pkt):
     from api_catalog import CatalogApi

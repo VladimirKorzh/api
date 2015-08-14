@@ -12,6 +12,7 @@ class BaseModel(Model):
 class User(BaseModel):
     uuid = CharField(unique=True)
     db = TextField(null=True)
+    timestamp = IntegerField(null=True)
 
 class Device(BaseModel):
     user = ForeignKeyField(User, related_name='devices', null=True)
