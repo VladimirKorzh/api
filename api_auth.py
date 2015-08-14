@@ -110,7 +110,9 @@ class ApiAuth(ApiBase):
                 n = NetworkPacket()
                 n.data['status'] = "OK"
                 n.data['message'] = {}
-                n.data['message']['db'] = user.db
+                print json.dumps(user.db)
+
+                n.data['message']['db'] = json.dumps(user.db)
                 n.data['message']['uuid'] = user.uuid
                 self.send(str(self.map[self.client_queue]), n.toJson())
                 return
@@ -209,7 +211,7 @@ class ApiAuth(ApiBase):
                 return None, None
             else:
 
-                d = json.loads(userSocialData.data.replace("'","\"").replace("u\"", "\""))
+                d = json.dumps(userSocialData.data)
 
                 if d['password'] == value['password']:
                     uuid = self.generate_uuid(value['login'])
