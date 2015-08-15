@@ -19,7 +19,7 @@ VALID_REQUEST_TYPES = []
 
     reply: "UPDATE"
     message: {db}
-
+xw
     reply: "ERROR"
     message: "User does not Exist"
 """
@@ -76,9 +76,6 @@ class SyncApi (ApiBase):
             n.data['message'] = byteify(json.loads(user.db))
             print n.data['message']
             self.send(str(self.map[self.client_queue]), n.toJson())
-
-
-
 
 def main():
     import time

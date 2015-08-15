@@ -7,7 +7,7 @@ HOST = 'rabbitmq.it4medicine.com'
 HEARTBEAT = 5
 PREFETCH_COUNT = 10
 X_MESSAGE_TTL = 60000
-MAIN_QUEUE_NAME = 'request-vk'
+MAIN_QUEUE_NAME = 'request-ay'
 
 
 def auth_handler(props, pkt):

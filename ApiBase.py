@@ -2,7 +2,7 @@
 import json, pika
 from api import HOST, HEARTBEAT, X_MESSAGE_TTL
 
-WORKER_CONNECTION_TIMEOUT = 10
+WORKER_CONNECTION_TIMEOUT = 25
 
 class ApiBase():
     def __init__(self):

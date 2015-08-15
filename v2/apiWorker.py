@@ -16,8 +16,8 @@ class ApiWorker():
 
         self.ENDPOINTS = {'auth': ApiAuth(),
                           'sync': SyncApi(),
-                          'ping': PingApi()}
-                          # 'catalog': CatalogApi()}
+                          'ping': PingApi(),
+                           'catalog': CatalogApi()}
 
         self.db = db
         self.db.connect()
@@ -113,6 +113,7 @@ from DatabaseModels import *
 from api_auth import ApiAuth
 from api_sync import SyncApi
 from api_ping import PingApi
+from api_catalog import CatalogApi
 
 
 def main():
