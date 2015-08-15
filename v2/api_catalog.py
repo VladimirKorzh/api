@@ -12,7 +12,7 @@ from playhouse.shortcuts import *
 
 from geopy.geocoders import Yandex
 
-db = SqliteDatabase('test2_db')
+db = SqliteDatabase('test_db')
 Pharmacy = load_csv(db, 'catalog_pharmacy.csv')
 
 class CatalogApi():
