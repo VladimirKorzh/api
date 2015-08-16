@@ -42,7 +42,7 @@ class ApiAuth():
             if type == 'add_account':
                 self.handle_addaccount(ch, method, props, pkt)
         else:
-            send_error(ch, method, props, 'Invalid request field type')
+            ApiWorker.send_error(ch, method, props, 'Invalid request field type')
 
     def handle_login(self, ch, method, props, pkt):
         # lets check his account information first
@@ -57,13 +57,13 @@ class ApiAuth():
             n = NetworkPacket()
             n.data['status'] = "OK"
             n.data['message'] = None
-            send_reply(ch, method, props, n.toJson())
+            ApiWorker.send_reply(ch, method, props, n.toJson())
             return
 
         value = pkt.data['message']['medium_data']
 
         if medium not in VALID_MEDIUM_TYPES:
-            send_error(ch, method, props, 'Invalid login medium')
+            ApiWorker.send_error(ch, method, props, 'Invalid login medium')
             return
         else:
             userSocialData = None
@@ -104,7 +104,7 @@ class ApiAuth():
                     n.data['message']['db'] = None
 
                 n.data['message']['uuid'] = user.uuid
-                send_reply(ch, method, props, n.toJson())
+                ApiWorker.send_reply(ch, method, props, n.toJson())
                 return
 
     def handle_addaccount(self, ch, method, props, pkt):
@@ -138,17 +138,17 @@ class ApiAuth():
                     n.data['status'] = "OK"
                     n.data['message'] = {}
                     n.data['message']['uuid'] = uuid
-                    send_reply(ch, method, props, n.toJson())
+                    ApiWorker.send_reply(ch, method, props, n.toJson())
                 else:
-                    send_error(ch, method, props, 'Social account is linked to another User')
+                    ApiWorker.send_error(ch, method, props, 'Social account is linked to another User')
             else:
-                send_error(ch, method, props, 'Invalid login medium')
+                ApiWorker.send_error(ch, method, props, 'Invalid login medium')
 
         except KeyError as e:
-            send_error(ch, method, props, 'Have you forgotten some field? ' + str(e.message))
+            ApiWorker.send_error(ch, method, props, 'Have you forgotten some field? ' + str(e.message))
 
         except DoesNotExist as e:
-            send_error(ch, method, props, 'User with this UUID does not exist.' + str(e.message))
+            ApiWorker.send_error(ch, method, props, 'User with this UUID does not exist.' + str(e.message))
 
     def handle_email(self, ch, method, props, pkt):
         medium = pkt.data['message']['medium_type']
@@ -164,7 +164,7 @@ class ApiAuth():
         if pkt.data['func'] == 'register':
             # check if user already exists in database
             if userSocialData is not None:
-                send_error(ch, method, props, "User with these credentials exists")
+                ApiWorker.send_error(ch, method, props, "User with these credentials exists")
                 return None, None
             else:
                 # create new social data object
@@ -179,7 +179,7 @@ class ApiAuth():
         if pkt.data['func'] == 'login':
 
             if userSocialData is None:
-                send_error(ch, method, props, "User with these credentials does not exist")
+                ApiWorker.send_error(ch, method, props, "User with these credentials does not exist")
                 return None, None
             else:
                 print userSocialData.data
@@ -194,7 +194,7 @@ class ApiAuth():
 
                 else:
                     print ' -- user with such login/pass not found '
-                    send_error(ch, method, props, "Password is invalid")
+                    ApiWorker.send_error(ch, method, props, "Password is invalid")
                     return None, None
 
 
@@ -223,13 +223,13 @@ class ApiAuth():
         return user
 
 
-from apiWorker import send_error, send_reply, byteify
+from apiWorker import byteify, ApiWorker
 
 
 def main():
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(n.data)
+    # import pprint
+    # pp = pprint.PrettyPrinter(indent=4)
+    # pp.pprint(n.data)
     n = NetworkPacket()
     n.data['api'] = 'auth'
     n.data['func'] = 'login'

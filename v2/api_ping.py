@@ -1,5 +1,5 @@
 __author__ = 'vladimir'
-from apiWorker import send_reply
+from apiWorker import ApiWorker
 
 """
     request: ping
@@ -12,4 +12,4 @@ class PingApi():
         pass
 
     def on_request(self, ch, method, props, body):
-        send_reply(ch, method, props, "pong")
+        ApiWorker.send_reply(ch, method, props, "pong")

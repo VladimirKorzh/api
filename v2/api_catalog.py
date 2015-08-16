@@ -1,8 +1,7 @@
 __author__ = 'Alex'
 
 
-from apiWorker import send_error
-from apiWorker import send_reply
+from apiWorker import ApiWorker
 import json
 import time
 from NetworkPacket import NetworkPacket
@@ -43,13 +42,13 @@ class CatalogApi():
                 n.data['status'] = 'OK'
                 n.data['message'] = toJson(self.CATALOGS[type], offset, limit)
         else:
-            send_error(ch, method, props, body, 'Invalid func field')
+            ApiWorker.send_error(ch, method, props, body, 'Invalid func field')
             self.db.close()
      else:
-        send_error(ch, method, props, body, 'Invalid catalog name')
+        ApiWorker.send_error(ch, method, props, body, 'Invalid catalog name')
         self.db.close()
         return
-     send_reply(ch, method, props, n.toJson())
+     ApiWorker.send_reply(ch, method, props, n.toJson())
      self.db.close()
      return
 

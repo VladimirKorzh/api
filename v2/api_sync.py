@@ -36,7 +36,7 @@ class SyncApi():
         try:
             user = User.select().where(User.uuid == uuid).get()
         except DoesNotExist, e:
-            send_error(ch, method, props, "User does not Exist")
+            ApiWorker.send_error(ch, method, props, "User does not Exist")
             return
 
         if user.db != None:
@@ -44,10 +44,10 @@ class SyncApi():
         else:
             srv_utc = 0
 
-        print srv_utc, cli_utc
+        # print srv_utc, cli_utc
         if cli_utc > srv_utc:
 
-            print byteify(json.dumps(pkt.data['message']['db']))
+            # print byteify(json.dumps(pkt.data['message']['db']))
 
             user.db = byteify(json.dumps(pkt.data['message']['db']))
             user.timestamp = cli_utc
@@ -55,19 +55,19 @@ class SyncApi():
             n = NetworkPacket()
             n.data['status'] = "OK"
             n.data['message'] = "Thank you"
-            send_reply(ch, method, props, n.toJson())
+            ApiWorker.send_reply(ch, method, props, n.toJson())
         else:
-            print byteify(json.loads(user.db))
+            # print byteify(json.loads(user.db))
 
             n = NetworkPacket()
             n.data['status'] = "UPDATE"
             n.data['message'] = byteify(json.loads(user.db))
-            print n.data['message']
-            send_reply(ch, method, props, n.toJson())
+            # print n.data['message']
+            ApiWorker.send_reply(ch, method, props, n.toJson())
 
 
 
-from apiWorker import send_reply, send_error, byteify
+from apiWorker import byteify, ApiWorker
 
 def main():
     pass
