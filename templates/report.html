@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8" />
+<title>Nurse-mobile report</title>
+<style>
+  body, img, hr {
+    margin:0;
+    padding:0;
+    font-family: impact;
+    color:#555;
+  }
+  header, footer, h1 {
+    text-align:center;
+  }
+  hr {
+    /*margin-top:-50px;*/
+    /*margin-bottom: 50px;*/
+    height: 12px;
+    border: 0;
+    box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.2);
+  }
+  h2 {
+    /*color: rgba(0, 0, 0, 0.5);*/
+    color:#888;
+    font-weight:normal;
+    margin:8px 0;
+  }
+  footer {
+    position:absolute;
+    width:100%;
+    bottom:0;
+  }
+  footer .social {
+    background: rgb(0,154,142);
+    padding:8px 0
+  }
+  a {
+    color: rgba(255, 255, 255, 1);
+    text-decoration: none;
+    padding:0 8pt;
+    font-size: 10pt
+  }
+  main {
+    min-height: 300px;
+    width:80%;
+    margin: 10px auto;
+  }
+  main .footer {
+    margin-top: 10px;
+    text-align: center;
+    color: #888
+  }
+</style>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h2>Мобильная медсестра</h2>
+      <img src="data:image/jpg;base64,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"/>
+      <hr>
+    </div>
+  </header>
+  <main>
+    <h1>{{header}}</h1>
+    <div class="content">{{content}}</div>
+    <div class="footer">{{footer}}</div>
+  </main>
+  <footer>
+    <div class="social">
+      <div>
+        <span>
+          <a href="http://nurse-mobile.com">
+            <i class="fa fa-chrome"></i> nurse-mobile.com
+          </a>
+        </span>
+        <span>
+          <a href="http://facebook.com/nurse-mobile">
+            <i class="fa fa-facebook"></i> facebook.com/nurse-mobile
+          </a>
+        </span>
+        <span>
+          <a href="call:+380445698502">
+            <i class="fa fa-phone"></i> +38(044)569-85-02(03)
+          </a>
+        </span>
+        <span>
+          <a href="mailto:info@it4medicine.com">
+            <i class="fa fa-envelope-o"></i> info@it4medicine.com
+          </a>
+        </span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
