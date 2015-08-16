@@ -2,7 +2,8 @@ __author__ = 'vladimir'
 
 from peewee import *
 
-db = SqliteDatabase('nurse_mobile.db')
+# db = SqliteDatabase('nurse_mobile.db')
+db = MySQLDatabase("nurse-mobile-py", host="sc.nurse-mobile.com", user="nurse_mobile_py", passwd="X7w7U1o6")
 
 class BaseModel(Model):
     class Meta:
@@ -26,5 +27,3 @@ class SocialData(BaseModel):
     medium = CharField(null=True)
     value = CharField(null=True)
     data = TextField(null=True)
-
-
