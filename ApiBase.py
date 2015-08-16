@@ -2,6 +2,7 @@
 import json, pika
 from api import HOST, HEARTBEAT, X_MESSAGE_TTL
 
+WORKER_CONNECTION_TIMEOUT = 25
 
 class ApiBase():
     def __init__(self):
@@ -13,7 +14,7 @@ class ApiBase():
 
     def start(self, props, pkt):
         self.mqConnection = pika.BlockingConnection(pika.ConnectionParameters(host=HOST))
-        self.mqConnection.add_timeout(30, self.stop)
+        self.mqConnection.add_timeout(WORKER_CONNECTION_TIMEOUT, self.stop)
 
         self.channel = self.mqConnection.channel()
         self.channel.basic_qos(prefetch_count=1)
