@@ -13,10 +13,10 @@ from email import Encoders
 
 class SendEmail():
     def __init__(self):
-        self.username = "petrenkodesign@gmail.com"
-        self.password = "jrfsavccjfytypkf"
-        self.fromuser = "huligan@fuck.you"
-        self.touser = "toallex@gmail.com"
+        self.username = "info@it4medicine.com"
+        self.password = ""
+        self.fromuser = "info@it4medicine.com"
+        self.touser = "zayats.andrey@gmail.com, marketing@nurse-mobile.com"
 
     def send(self, msgbody="", msgtype="html", fromuser="", touser="", subject="Nurse mobile", attachment=""):
     # type = html or plant
