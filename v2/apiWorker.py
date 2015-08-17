@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from log import Log
 
 HOST = 'rabbitmq.it4medicine.com'
 PREFETCH_COUNT = 10
@@ -65,7 +66,8 @@ class ApiWorker(threading.Thread):
         channel = self.apiWorkerHandler.perform_architecture_setup()
         channel.basic_consume(self.on_request, queue=self.listenQueueName)
 
-        print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
+        # print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
+        Log().send(type = "info", msg = "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
         channel.start_consuming()
 
     def stop_service(self):
