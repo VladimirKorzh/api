@@ -28,3 +28,11 @@ class SocialData(BaseModel):
     data = TextField(null=True)
 
 
+class Notification(BaseModel):
+    receiver = ForeignKeyField(User, related_name='inbox', null=False)
+    sender = ForeignKeyField(User, related_name='sent', null=False)
+
+    type = IntegerField()
+
+    message = TextField()
+    status = BooleanField()
