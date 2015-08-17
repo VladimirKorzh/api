@@ -1,4 +1,17 @@
-#!/bin/sh -e
+#!/bin/sh
+#
+# Script add apiWorker api module for MQ to started services
+#
+
+### BEGIN INIT INFO
+# Provides:          server_py
+# Required-Start:    $server_py
+# Required-Stop:     $server_py
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: start api module
+### END INIT INFO
+
 
 DAEMON="/var/www/nurse-mobile/data/www/sc.nurse-mobile.com/api_py/v2/apiWorker.py"
 DAEMONUSER="root"
