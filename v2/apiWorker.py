@@ -67,7 +67,7 @@ class ApiWorker(threading.Thread):
         channel.basic_consume(self.on_request, queue=self.listenQueueName)
 
         # print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
-        Log.send(type = "info", msg = "[x] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
+        Log().send(type = "info", msg = "[x] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
         channel.start_consuming()
 
     def stop_service(self):

@@ -9,7 +9,7 @@ class Log():
     def __init__(self):
         self.format = u'%(levelname)-8s [%(asctime)s] %(message)s'
         self.level = logging.DEBUG
-        self.filename = u'server_api_log.log'
+        self.filename = u'../server_api_log.log'
 
     def send(self, type, msg):
         logging.basicConfig(format = self.format, level = self.level, filename = self.filename)
@@ -25,8 +25,8 @@ class Log():
         if type == 'critical':
             logging.critical( msg )
 
-# if __name__ == '__main__':
-#     if len(sys.argv) > 1:
-#         Log().send(type = sys.argv[1], msg = sys.argv[2])
-#     else:
-#         Log().send(type = "info", msg = "No data!")
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        Log().send(type = sys.argv[1], msg = sys.argv[2])
+    else:
+        Log().send(type = "info", msg = "No data!")
