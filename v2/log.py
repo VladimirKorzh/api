@@ -4,12 +4,13 @@ __author__ = 'Alex Petrenko'
 
 import logging
 import sys
+import os
 
 class Log():
     def __init__(self):
         self.format = u'%(levelname)-8s [%(asctime)s] %(message)s'
         self.level = logging.DEBUG
-        self.filename = u'../server_api_log.log'
+        self.filename = os.path.abspath(os.path.dirname(__file__)) + '/../server_api_log.log'
 
     def send(self, type, msg):
         logging.basicConfig(format = self.format, level = self.level, filename = self.filename)
