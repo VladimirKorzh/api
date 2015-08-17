@@ -67,11 +67,12 @@ class ApiWorker(threading.Thread):
         channel.basic_consume(self.on_request, queue=self.listenQueueName)
 
         # print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
-        Log().send(type = "info", msg = "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
+        Log().send(type = "info", msg = "[x] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
         channel.start_consuming()
 
     def stop_service(self):
-        print "[!] " + str(self.threadID) + "API Worker " + MAIN_QUEUE_NAME + " stopping..."
+        # print "[x] " + str(self.threadID) + "API Worker " + MAIN_QUEUE_NAME + " stopping..."
+        Log().send(type = "info", msg = "[x] " + str(self.threadID) + "API Worker " + MAIN_QUEUE_NAME + " stopping")
         sys.exit(0)
 
     def on_request(self, ch, method, props, body):
@@ -81,7 +82,9 @@ class ApiWorker(threading.Thread):
             # print body
             api2call = pkt.data['api']
             if api2call in self.apiWorkerHandler.ENDPOINTS.keys():
-                print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
+                # print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
+                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id))
+
                 self.apiWorkerHandler.ENDPOINTS[api2call].on_request(ch, method, props, body)
             else:
                 self.send_error(ch, method, props, 'API call is not valid')
@@ -107,7 +110,8 @@ class ApiWorker(threading.Thread):
 
         ch.basic_nack(delivery_tag=method.delivery_tag, multiple=False, requeue=False)
 
-        print " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload
+        # print " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload
+        Log().send(type = "info", msg = " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload)
         # logFile.write(payload+'\n')
 
     @staticmethod
@@ -119,7 +123,8 @@ class ApiWorker(threading.Thread):
                          body=payload)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        print " ~~ Reply msg sent to " + str(props.reply_to) + ": " + payload
+        # print " ~~ Reply msg sent to " + str(props.reply_to) + ": " + payload
+        Log().send(type = "info", msg = " ~~ Reply msg sent to " + str(props.reply_to) + ": " + payload)
         # logFile.write(payload+'\n')
 
 
