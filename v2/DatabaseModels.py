@@ -2,7 +2,7 @@ __author__ = 'vladimir'
 
 from peewee import *
 
-db = SqliteDatabase('nurse_mobile.db')
+db = peewee.MySQLDatabase("nurse-mobile-py", host="localhost", user="nurse_mobile_py", passwd="X7w7U1o6")
 
 class BaseModel(Model):
     class Meta:
