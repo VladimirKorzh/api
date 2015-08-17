@@ -6,7 +6,7 @@ X_MESSAGE_TTL = 60000
 VERSION = 2
 VERSION_PREFIX = '.v' + str(VERSION) + '.'
 MAIN_QUEUE_NAME = 'api' + VERSION_PREFIX + 'requests'
-THREAD_COUNT = 4
+THREAD_COUNT = 1
 
 # import datetime
 # logFileName = datetime.datetime.now().strftime("%d.%m_at_%H:%M") + '.nml'
