@@ -66,7 +66,7 @@ class ApiWorker(threading.Thread):
         channel = self.apiWorkerHandler.perform_architecture_setup()
         channel.basic_consume(self.on_request, queue=self.listenQueueName)
 
-        print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
+        # print "[!] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started."
         Log.send(type = "info", msg = "[x] " + str(self.threadID) + " API Worker " + MAIN_QUEUE_NAME + " started.")
         channel.start_consuming()
 
