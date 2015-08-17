@@ -4,6 +4,8 @@ __author__ = 'Alex'
 from apiWorker import ApiWorker
 import json
 import time
+import peewee
+from peewee import *
 from NetworkPacket import NetworkPacket
 
 from playhouse.csv_loader import load_csv
@@ -13,8 +15,18 @@ from geopy.geocoders import Yandex
 
 # db = SqliteDatabase('test_db')
 # Pharmacy = load_csv(db, '../catalog_pharmacy.csv')
-db = MySQLDatabase("nurse-mobile-py", host="sc.nurse-mobile.com", user="nurse_mobile_py", passwd="X7w7U1o6")
-Pharmacy = load_csv(db, '../catalog_pharmacy.csv')
+# db = peewee.MySQLDatabase("nurse-mobile-py", host="localhost", user="alex", passwd="123456")
+
+# class MySQLModel(peewee.Model):
+#     class Meta:
+#         database = db
+#
+# class Pharmacy(MySQLModel):
+#     id = peewee.CharField(primary_key=True)
+#
+# db.connect()
+
+Pharmacy = Pharmacy.select()
 
 class CatalogApi():
     def __init__(self):
