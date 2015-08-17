@@ -1,8 +1,11 @@
 __author__ = 'vladimir'
 
 from peewee import *
+import datetime
 
-db = peewee.MySQLDatabase("nurse-mobile-py", host="localhost", user="nurse_mobile_py", passwd="X7w7U1o6")
+db = None
+
+db = MySQLDatabase("nurse-mobile-py", host="localhost", user="nurse_mobile_py", passwd="X7w7U1o6")
 
 class BaseModel(Model):
     class Meta:
@@ -27,6 +30,17 @@ class SocialData(BaseModel):
     value = CharField(null=True)
     data = TextField(null=True)
 
+
+class Notification(BaseModel):
+    receiver = ForeignKeyField(User, related_name='inbox', null=False)
+    sender = ForeignKeyField(User, related_name='sent', null=False)
+    created_date = DateTimeField(default=datetime.datetime.now)
+
+    type = IntegerField()
+
+    message = TextField()
+    status = BooleanField()
+
 class Pharmacy(BaseModel):
     id = CharField(primary_key=True)
     name = TextField(null=True)
@@ -42,11 +56,7 @@ class Pharmacy(BaseModel):
     lon = CharField(null=True)
     lat = CharField(null=True)
 
-class Notification(BaseModel):
-    receiver = ForeignKeyField(User, related_name='inbox', null=False)
-    sender = ForeignKeyField(User, related_name='sent', null=False)
-
-    type = IntegerField()
-
-    message = TextField()
-    status = BooleanField()
+if db is None:
+    db = SqliteDatabase(':memory:')
+    DB_TABLES = [User, SocialData, Device]
+    db.create_tables(DB_TABLES)

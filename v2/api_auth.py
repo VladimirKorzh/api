@@ -8,8 +8,9 @@ import json
     ['api'] = 'auth'
     ['func'] = 'login'
     ['message']
-        ['medium_type']
-        ['medium_data']
+        ['medium_type']   -> email
+        ['medium_data']['login']   -> vladimirkorshak@gmail.com
+        ['medium_data']['password'] -> 228121389
 
         ['device_data']
             ['device_id']
@@ -24,7 +25,7 @@ import json
 
 
 VALID_REQUEST_TYPES = ['login', 'add_account', 'register']
-VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone', 'email']
+VALID_MEDIUM_TYPES = ['vk', 'fb', 'gp', 'phone', 'email', 'guest']
 
 
 class ApiAuth():

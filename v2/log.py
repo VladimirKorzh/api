@@ -14,6 +14,7 @@ class Log():
 
     def send(self, type, msg):
         logging.basicConfig(format = self.format, level = self.level, filename = self.filename)
+        print msg
 
         if type == 'debug':
             logging.debug( msg )

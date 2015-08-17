@@ -3,7 +3,6 @@ from DatabaseModels import *
 
 
 DB_TABLES = [User, SocialData, Device]
-
 def main():
     db.connect()
     try:

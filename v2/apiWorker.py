@@ -6,6 +6,7 @@ PREFETCH_COUNT = 10
 X_MESSAGE_TTL = 60000
 VERSION = 2
 VERSION_PREFIX = '.v' + str(VERSION) + '.'
+#MAIN_QUEUE_NAME = 'api' + VERSION_PREFIX + 'test'
 MAIN_QUEUE_NAME = 'api' + VERSION_PREFIX + 'requests'
 THREAD_COUNT = 1
 
@@ -14,13 +15,13 @@ THREAD_COUNT = 1
 # logFile = open('./logs/'+logFileName, 'w')
 #
 
-
 class ApiWorkerHandler():
     def __init__(self, mqconnection=None):
         self.ENDPOINTS = {'auth': ApiAuth(),
                           'sync': SyncApi(),
                           'ping': PingApi(),
-                           'catalog': CatalogApi()}
+                          'catalog': CatalogApi(),
+                          'notification': NotificationApi()}
 
         self.db = db
         self.db.connect()
@@ -38,6 +39,10 @@ class ApiWorkerHandler():
 
         channel.exchange_declare(exchange='api'+VERSION_PREFIX,
                                         type='direct',
+                                        durable=True)
+
+        channel.exchange_declare(exchange='push'+VERSION_PREFIX,
+                                        type='topic',
                                         durable=True)
 
         self.listening_on = channel.queue_declare(queue=MAIN_QUEUE_NAME,
@@ -79,7 +84,7 @@ class ApiWorker(threading.Thread):
         try:
             pkt = NetworkPacket.fromJson(body)
             # logFile.write(body+'\n')
-            # print body
+            print body
             api2call = pkt.data['api']
             if api2call in self.apiWorkerHandler.ENDPOINTS.keys():
                 # print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
@@ -159,9 +164,11 @@ from api_auth import ApiAuth
 from api_sync import SyncApi
 from api_ping import PingApi
 from api_catalog import CatalogApi
+from api_notification import NotificationApi
 
 API_HANDLER = None
 WORKER_LIST = []
+
 
 def main():
     global API_HANDLER, WORKER_LIST
