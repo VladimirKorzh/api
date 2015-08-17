@@ -27,4 +27,17 @@ class SocialData(BaseModel):
     value = CharField(null=True)
     data = TextField(null=True)
 
-
+class Pharmacy(BaseModel):
+    id = CharField(primary_key=True)
+    name = TextField(null=True)
+    desc = TextField()
+    phone = TextField()
+    website = TextField()
+    email = TextField()
+    city = TextField()
+    addr = TextField()
+    metro = TextField()
+    area = TextField()
+    country = TextField()
+    lon = CharField(null=True)
+    lat = CharField(null=True)

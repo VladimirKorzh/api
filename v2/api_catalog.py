@@ -2,10 +2,9 @@ __author__ = 'Alex'
 
 
 from apiWorker import ApiWorker
+import DatabaseModels
 import json
 import time
-import peewee
-from peewee import *
 from NetworkPacket import NetworkPacket
 
 from playhouse.csv_loader import load_csv
@@ -26,7 +25,7 @@ from geopy.geocoders import Yandex
 #
 # db.connect()
 
-Pharmacy = Pharmacy.select()
+Pharmacy = DatabaseModels.Pharmacy.select()
 
 class CatalogApi():
     def __init__(self):
