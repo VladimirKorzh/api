@@ -14,7 +14,7 @@ from email import Encoders
 class SendEmail():
     def __init__(self):
         self.username = "info@it4medicine.com"
-        self.password = ""
+        self.password = "L06pstK8"
         self.fromuser = "info@it4medicine.com"
         self.touser = "zayats.andrey@gmail.com, marketing@nurse-mobile.com"
 
