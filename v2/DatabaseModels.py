@@ -5,7 +5,7 @@ import datetime
 
 db = None
 
-db = MySQLDatabase("nurse-mobile-py", host="localhost", user="nurse_mobile_py", passwd="X7w7U1o6")
+db = MySQLDatabase("nurse_mobile_py", host="localhost", user="nurse_mobile_py", passwd="X7w7U1o6")
 
 class BaseModel(Model):
     class Meta:

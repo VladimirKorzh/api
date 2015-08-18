@@ -9,7 +9,7 @@ import os
 class Log():
     def __init__(self):
         self.format = u'%(levelname)-8s [%(asctime)s] %(message)s'
-        self.level = logging.DEBUG
+        self.level = logging.ERROR
         self.filename = os.path.abspath(os.path.dirname(__file__)) + '/../server_api_log.log'
 
     def send(self, type, msg):
