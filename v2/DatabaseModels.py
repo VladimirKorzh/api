@@ -111,7 +111,7 @@ class Drugs(BaseModel):
     age = CharField()
     maker = TextField()
     composition = CharField()
-    pharmacology-action = CharField()
+    pharmacology-action = TextField()
     nozology = CharField()
     indications = CharField()
     pharmacodynamics = CharField()
