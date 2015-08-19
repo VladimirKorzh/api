@@ -26,6 +26,10 @@ from geopy.geocoders import Yandex
 # db.connect()
 
 Pharmacy = DatabaseModels.Pharmacy.select()
+Clinics = DatabaseModels.Clinics.select()
+Labs = DatabaseModels.Labs.select()
+Drugs = DatabaseModels.Drugs.select()
+Disease = DatabaseModels.Disease.select()
 
 class CatalogApi():
     def __init__(self):
@@ -33,7 +37,11 @@ class CatalogApi():
         # self.Clinics = load_csv(self.db, 'catalog_clinics.csv')
         # self.Drugs = load_csv(self.db, 'catalog_clinics.csv')
         # self.Disease = load_csv(self.db, 'catalog_disease.csv')
-        self.CATALOGS = {'pharmacy': Pharmacy}
+        self.CATALOGS = {'pharmacy': Pharmacy,
+                        'clinics': Clinics,
+                        'labs': Labs,
+                        'drugs': Drugs,
+                        'disease': Disease}
                          # 'clinics': self.Clinics,
                          # 'drugs': self.Drugs,
                          # 'diseases': self.Disease}
