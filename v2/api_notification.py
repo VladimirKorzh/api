@@ -43,17 +43,36 @@ class NotificationApi():
         if type in VALID_REQUEST_TYPES:
             if type in ['push']:
                 rcv = pkt.data['message']['receiver']
+                snd = pkt.data['uuid']
+
+                payload = pkt.data['message']['body']
+                type = pkt.data['message']['type']
+
 
                 rcv_user = None
+                snd_user = None
                 if rcv['email'] is not None:
                     rcv_user = SocialData.select().where( SocialData.medium == 'email' and SocialData.value == rcv['email'] )
                 if rcv['phone'] is not None and rcv_user is None:
                     rcv_user = SocialData.select().where( SocialData.medium == 'phone' and SocialData.value == rcv['phone'] )
 
-                if rcv_user is None:
-                    ApiWorker.send_error(ch, method, props, body, 'Receiver user could not be found')
+                if snd['email'] is not None:
+                    snd_user = SocialData.select().where( SocialData.medium == 'email' and SocialData.value == snd['email'] )
+                if snd['phone'] is not None and snd_user is None:
+                    snd_user = SocialData.select().where( SocialData.medium == 'phone' and SocialData.value == snd['phone'] )
+
+
+
+                if rcv_user is None or snd_user is None:
+                    ApiWorker.send_error(ch, method, props, 'Receiver or Sender user could not be found')
                 else:
                     # save notification in db
+                    notification = Notification()
+                    notification.receiver = rcv_user
+                    notification.sender = snd_user
+                    notification.message = payload
+                    notification.type = type
+                    notification.status = False
 
                     # send push all connected devices based on uuid of receiver
                     ch.basic_publish(exchange='push'+VERSION_PREFIX,

@@ -25,6 +25,21 @@ from geopy.geocoders import Yandex
 #
 # db.connect()
 
+
+"""
+    ['api']  'catalog'
+    ['catalog_name']  'pharmacy'
+    ['func'] 'get_catalog']
+    ['message']
+        ['offset'] 0
+        ['limit'] 50
+
+
+    ['status'] OK
+    ['message'] [ {}, {}, {} ]
+"""
+
+
 Pharmacy = DatabaseModels.Pharmacy.select()
 
 class CatalogApi():
