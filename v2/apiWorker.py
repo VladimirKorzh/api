@@ -88,7 +88,7 @@ class ApiWorker(threading.Thread):
             api2call = pkt.data['api']
             if api2call in self.apiWorkerHandler.ENDPOINTS.keys():
                 # print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
-                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)) + body
+                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)) + method + body
 
                 self.apiWorkerHandler.ENDPOINTS[api2call].on_request(ch, method, props, body)
             else:
