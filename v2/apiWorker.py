@@ -116,7 +116,7 @@ class ApiWorker(threading.Thread):
         ch.basic_nack(delivery_tag=method.delivery_tag, multiple=False, requeue=False)
 
         # print " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload
-        Log().send(type = "info", msg = " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload)
+        Log().send(type = "info", msg = " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload + msg)
         # logFile.write(payload+'\n')
 
     @staticmethod
