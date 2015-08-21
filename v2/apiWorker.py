@@ -84,11 +84,11 @@ class ApiWorker(threading.Thread):
         try:
             pkt = NetworkPacket.fromJson(body)
             # logFile.write(body+'\n')
-            # print body
+            print body
             api2call = pkt.data['api']
             if api2call in self.apiWorkerHandler.ENDPOINTS.keys():
                 # print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
-                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)) + method + body
+                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id))
 
                 self.apiWorkerHandler.ENDPOINTS[api2call].on_request(ch, method, props, body)
             else:
@@ -98,7 +98,7 @@ class ApiWorker(threading.Thread):
             self.send_error(ch, method, props, 'Have you forgot to state which API endpoint you are calling?')
 
         except Exception as e:
-            self.send_error(ch, method, props, 'ValueError: Packet was not recognized by API SERVICE, ' + str(e.message))
+            self.send_error(ch, method, props, 'ValueError: Packet was not recognized by API SERVICE, ' + str(e.message)) + "BODY:" + body
 
     @staticmethod
     def send_error(ch, method, props, msg):
@@ -116,7 +116,7 @@ class ApiWorker(threading.Thread):
         ch.basic_nack(delivery_tag=method.delivery_tag, multiple=False, requeue=False)
 
         # print " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload
-        Log().send(type = "info", msg = " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload + msg)
+        Log().send(type = "info", msg = " ~~ Error msg sent to " + str(props.reply_to) + ": " + payload)
         # logFile.write(payload+'\n')
 
     @staticmethod
