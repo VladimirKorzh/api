@@ -98,7 +98,7 @@ class ApiWorker(threading.Thread):
             self.send_error(ch, method, props, 'Have you forgot to state which API endpoint you are calling?')
 
         except Exception as e:
-            self.send_error(ch, method, props, 'ValueError: Packet was not recognized by API SERVICE, ' + str(e.message)) + "BODY:" + body
+            self.send_error(ch, method, props, 'ValueError: Packet was not recognized by API SERVICE, ' + str(e.message))
 
     @staticmethod
     def send_error(ch, method, props, msg):
