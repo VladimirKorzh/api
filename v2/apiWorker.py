@@ -84,11 +84,11 @@ class ApiWorker(threading.Thread):
         try:
             pkt = NetworkPacket.fromJson(body)
             # logFile.write(body+'\n')
-            print body
+            # print body
             api2call = pkt.data['api']
             if api2call in self.apiWorkerHandler.ENDPOINTS.keys():
                 # print ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)
-                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id))
+                Log().send(type = "info", msg = ' ~ Executing "' + api2call + '" call for client ' + str(props.correlation_id)) + body
 
                 self.apiWorkerHandler.ENDPOINTS[api2call].on_request(ch, method, props, body)
             else:
